@@ -31,7 +31,6 @@ using System.Text;
 #if MONO
 using SevenZip.Mono.COM;
 #endif
-
 namespace SevenZip
 {
 #if UNMANAGED
@@ -56,8 +55,8 @@ namespace SevenZip
         ///     - Built decoders: LZMA, PPMD, BCJ, BCJ2, COPY, AES-256 Encryption, BZip2, Deflate.
         /// 7z.dll (from the 7-zip distribution) supports every InArchiveFormat for encoding and decoding.
         /// </remarks>
-        private static string _libraryFileName = ConfigurationManager.AppSettings["7zLocation"] ??
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "7z.dll");
+        private static string _libraryFileName = 
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "7z-x64.dll");
 #endif
 #if WINCE 		
         private static string _libraryFileName =
@@ -360,10 +359,6 @@ namespace SevenZip
         /// <param name="format">Archive format</param>
         public static void FreeLibrary(object user, Enum format)
         {
-#if !WINCE && !MONO
-            var sp = new SecurityPermission(SecurityPermissionFlag.UnmanagedCode);
-            sp.Demand();
-#endif
             lock (_syncRoot)
 			{
                 if (_modulePtr != IntPtr.Zero)
@@ -443,8 +438,6 @@ namespace SevenZip
                 if (_inArchives[user][format] == null)
                 {
 #if !WINCE && !MONO
-                    var sp = new SecurityPermission(SecurityPermissionFlag.UnmanagedCode);
-                    sp.Demand();
 
                     if (_modulePtr == IntPtr.Zero)
                     {
@@ -507,8 +500,7 @@ namespace SevenZip
                 if (_outArchives[user][format] == null)
                 {
 #if !WINCE && !MONO
-                    var sp = new SecurityPermission(SecurityPermissionFlag.UnmanagedCode);
-                    sp.Demand();
+                   
                     if (_modulePtr == IntPtr.Zero)
                     {
                         throw new SevenZipLibraryException();

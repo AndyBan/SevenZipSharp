@@ -18,9 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
-#if !WINCE
-using System.Runtime.Remoting.Messaging;
-#endif
+using System.Reflection;
 #if DOTNET20
 using System.Threading;
 #else
@@ -76,8 +74,12 @@ namespace SevenZip
         /// <param name="ar">IAsyncResult instance.</param>
         internal static void AsyncCallbackMethod(IAsyncResult ar)
         {
-            var result = (AsyncResult)ar;
-            result.AsyncDelegate.GetType().GetMethod("EndInvoke").Invoke(result.AsyncDelegate, new[] { ar });
+            object value = ar.GetType().GetRuntimeProperty("AsyncDelegate").GetValue(ar);
+            IntrospectionExtensions.GetTypeInfo(value.GetType())
+                .GetDeclaredMethod("EndInvoke").Invoke(value, new IAsyncResult[]
+             {
+                ar
+             });
             ((SevenZipBase)ar.AsyncState).ReleaseContext();
         }
 
@@ -395,7 +397,6 @@ Dispatcher == null
         /// <summary>
         /// Gets the current library features.
         /// </summary>
-        [CLSCompliant(false)]
         public static LibraryFeature CurrentLibraryFeatures
         {
             get
@@ -581,7 +582,6 @@ Dispatcher == null
         /// <summary>
         /// Gets or sets index of the file in the archive file table.
         /// </summary>
-        [CLSCompliant(false)]
         public int Index { get; set; }
 
         /// <summary>
@@ -607,19 +607,16 @@ Dispatcher == null
         /// <summary>
         /// Gets or sets size of the file (unpacked).
         /// </summary>
-        [CLSCompliant(false)]
         public ulong Size { get; set; }
 
         /// <summary>
         /// Gets or sets CRC checksum of the file.
         /// </summary>
-        [CLSCompliant(false)]
         public uint Crc { get; set; }
 
         /// <summary>
         /// Gets or sets file attributes.
         /// </summary>
-        [CLSCompliant(false)]
         public uint Attributes { get; set; }
 
         /// <summary>

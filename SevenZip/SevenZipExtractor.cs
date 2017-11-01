@@ -331,7 +331,6 @@ namespace SevenZip
         /// <summary>
         /// Gets the number of files in the archive
         /// </summary>
-        [CLSCompliant(false)]
         public uint FilesCount
         {
             get
@@ -410,7 +409,8 @@ namespace SevenZip
             }
             else
             {
-                if (!_fileName.EndsWith(".001", StringComparison.OrdinalIgnoreCase))
+                if (!_fileName.EndsWith(".001", StringComparison.OrdinalIgnoreCase)
+                    || (_volumeFileNames.Count == 1))
                 {
                     _archiveStream = new InStreamWrapper(
                         new ArchiveEmulationStreamProxy(new FileStream(
@@ -759,14 +759,12 @@ namespace SevenZip
             _archiveFileData = null;
             _archiveProperties = null;
             _archiveFileInfoCollection = null;
-            
-	    if (_inStream != null)
-	    {
+            if (_inStream != null)
+            {
                 _inStream.Dispose();
                 _inStream = null;
-	    }
-            
-	    if (_openCallback != null)
+            }
+            if (_openCallback != null)
             {
                 try
                 {

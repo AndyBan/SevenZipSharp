@@ -281,10 +281,7 @@ namespace SevenZip
                     }
                     var names = new List<IntPtr>(2 + CustomParameters.Count);
                     var values = new List<PropVariant>(2 + CustomParameters.Count);
-#if !WINCE
-                    var sp = new SecurityPermission(SecurityPermissionFlag.UnmanagedCode);
-                    sp.Demand();
-#endif
+
                     #region Initialize compression properties
 
                     if (_compressionMethod == CompressionMethod.Default)
